@@ -14,7 +14,7 @@ fn main() {
      assert_eq!(sk, sk_again);
 
      let secret = WrappedScalar(*sk.to_nonzero_scalar());
-     let res = Shamir::<2, 3>::split_secret::<WrappedScalar, OsRng, 33>(secret, &mut osrng);
+     let res = Shamir { t: 2, n: 3 }.split_secret::<WrappedScalar, OsRng>(secret, &mut osrng);
      assert!(res.is_ok());
      let shares = res.unwrap();
 
@@ -24,8 +24,8 @@ fn main() {
      assert_eq!(shares[..], shares_again[..]);
 
      // take the first and third share to recover the secret
-     let shares_subset = vec![shares[0], shares[2]];
-     let res = Shamir::<2, 3>::combine_shares::<WrappedScalar, 33>(&shares_subset[..]);
+     let shares_subset = vec![shares[0].clone(), shares[2].clone()];
+     let res =  Shamir { t: 2, n: 3 }.combine_shares::<WrappedScalar>(&shares_subset[..]);
      assert!(res.is_ok());
      let scalar = res.unwrap();
      let nzs_dup = NonZeroScalar::from_repr(scalar.to_repr()).unwrap();
